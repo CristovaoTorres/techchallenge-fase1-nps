@@ -82,10 +82,48 @@ O projeto segue o **CRISP-DM**. Cada fase corresponde a um notebook:
 | Decisão | Justificativa |
 |---|---|
 | **Classificação do NPS por corte direto** (Detrator < 7 ≤ Neutro < 9 ≤ Promotor) | As notas têm casas decimais. Um 6,8 não chegou a 7. A alternativa de arredondar foi testada (NPS −74 contra −80) e a conclusão não muda. |
-| **Imputação pela mediana** do tempo de entrega em 121 pedidos (4,8%) com atraso maior que o tempo total | Excluir esses pedidos tiraria da base os clientes mais insatisfeitos (nota média 2,3 contra 4,5). A **imputação por regressão linear** foi testada e descartada (R² = 0,017). O valor original foi preservado em `delivery_time_days_original`. |
-| **Desconto > valor do pedido** (35 pedidos) mantido | Interpretado como valor **líquido**. O % de desconto é calculado sobre o valor bruto. |
+| **Tempo de entrega corrigido** em 121 pedidos com atraso maior que o tempo total | Valor impossível. Corrigido por imputação pela mediana, sem excluir linhas. Detalhes abaixo. |
+| **Desconto > valor do pedido** (35 pedidos) mantido | Faz sentido se o valor do pedido for líquido. Detalhes abaixo. |
 | **Outliers mantidos** | São casos reais (atrasos longos, muitos contatos) e justamente os mais relevantes para entender detratores. |
 | **CSAT e recompra fora dos fatores explicativos** | Evita *leakage*: essas informações não existem antes da pesquisa de NPS. |
+
+### Dados inconsistentes: o que encontramos e como tratamos
+
+A base **não tem valores nulos nem linhas duplicadas**. O problema encontrado é outro: **valores que existem, mas são logicamente impossíveis** quando comparamos uma coluna com outra.
+
+#### Problema 1: atraso maior que o tempo total de entrega (121 pedidos, 4,8% da base)
+
+**O que está errado:** pelo dicionário de dados, `delivery_time_days` é o **tempo total** da entrega e `delivery_delay_days` são os **dias de atraso**. O atraso é uma **parte** do tempo total, então nunca poderia ser maior que ele. Mesmo assim, há 121 pedidos assim:
+
+| order_id | Tempo total de entrega | Dias de atraso | Por que é impossível |
+|---|---|---|---|
+| 50006 | 4 dias | 5 dias | A entrega levou 4 dias no total, mas atrasou 5? |
+| 50047 | 4 dias | 6 dias | Atraso 2 dias maior que a entrega inteira |
+| 50042 | 2 dias | 3 dias | Idem |
+
+**Qual das duas colunas está errada?** O **atraso** é coerente com o resto da linha: esses clientes deram notas muito baixas (média **2,3** contra **4,5** no resto da base), exatamente o que se espera de quem teve atraso longo. Então o valor suspeito é o **tempo total de entrega**.
+
+**As opções eram:**
+
+| Opção | Consequência | Decisão |
+|---|---|---|
+| **Excluir as 121 linhas** | Perderíamos o pedido inteiro (atraso, atendimento, nota), e justamente o grupo **mais insatisfeito** da base. A análise ficaria otimista e subestimaria o impacto do atraso. | ❌ |
+| **Manter como está** | Qualquer análise de prazo usaria um valor que não pode ser verdadeiro. | ❌ |
+| **Corrigir só a célula errada (imputação)** | Mantém o pedido e as outras 18 colunas, que estão corretas, e substitui apenas o tempo total de entrega por uma estimativa. | ✅ |
+
+**Como estimamos o valor correto:**
+1. **Regressão linear múltipla** (prever o tempo de entrega a partir das outras colunas): **testada e descartada**. O R² foi de **0,017**, ou seja, as outras colunas explicam menos de 2% do tempo de entrega. A regressão devolveria praticamente a média.
+2. **Mediana** dos pedidos sem inconsistência (**8 dias**): ✅ **adotada**. Quando nenhuma outra informação ajuda a prever o valor, o valor típico é a estimativa mais honesta. Também garantimos que o tempo total nunca fique menor que o atraso.
+
+O valor original foi **preservado** na coluna `delivery_time_days_original`, e a linha fica marcada com `flag_inconsistencia_prazo`, para que qualquer pessoa possa conferir ou reverter.
+
+#### Problema 2: desconto maior que o valor do pedido (35 pedidos, 1,4% da base)
+
+**O que parece errado:** no pedido 50007, o valor é **R$ 41,29** e o desconto é **R$ 99,62**. Se `order_value` fosse o preço cheio, o desconto seria maior que o próprio produto, o que é impossível.
+
+**Por que mantivemos:** existe uma leitura em que tudo faz sentido. Se `order_value` é o valor **já com o desconto aplicado** (o que o cliente efetivamente pagou), o preço cheio era R$ 41,29 + R$ 99,62 = **R$ 140,91**, e o desconto foi de 71%. Com essa interpretação, os 35 casos ficam coerentes e **nenhum valor precisa ser alterado**. O % de desconto passa a ser calculado sobre o valor bruto (`order_value + discount_value`), e as linhas ficam marcadas com `flag_inconsistencia_desconto`.
+
+O passo a passo completo, com o código, está na seção 5 do notebook [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb).
 
 ### Limitações
 
