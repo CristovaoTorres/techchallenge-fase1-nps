@@ -6,8 +6,9 @@ Análise de dados operacionais de um e-commerce (pedidos, logística e atendimen
 
 | Entregável | Link |
 |---|---|
-| 📊 Slides (storytelling gerencial) | `reports/` *(adicionar link)* |
-| 🎥 Vídeo executivo (até 5 min) | *(adicionar link)* |
+| 📓 Notebooks (entendimento, preparação e EDA) | [`notebooks/`](notebooks/) |
+| 📊 Slides (storytelling gerencial) | 🚧 em produção |
+| 🎥 Vídeo executivo (até 5 min) | 🚧 em produção |
 
 ---
 
@@ -26,12 +27,13 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 |---|---|
 | 🚨 **Retrato** | NPS de **−80**: 84% dos clientes são detratores e só 4% são promotores. |
 | 🚚 **Fator nº 1** | **Atraso na entrega.** Sem atraso: 52% de detratores. Com 3+ dias: **97–100%**. |
-| ⏱️ **Ponto de ruptura** | **3 dias de atraso.** Até o 2º dia ainda dá para recuperar o cliente, depois disso quase ninguém é recuperado. |
+| ⏱️ **Ponto de ruptura** | **A nota cai ~1 ponto por dia de atraso, desde o 1º dia.** A partir do **3º dia**, 97%+ já são detratores. A ação precisa começar no 1º dia. |
+| 📐 **Quanto pesa cada um** | Os 4 fatores juntos explicam **56%** da variação da nota. Cada dia de atraso custa 1 ponto; cada reclamação, 0,4; cada contato a mais, 0,3. |
 | 📦 **Prazo ≠ atraso** | O prazo total de entrega **não** afeta a nota. O que pesa é **quebrar a promessa**. |
 | 📞 **Atendimento** | Reclamações e contatos repetidos derrubam a nota: 3+ contatos = 95% de detratores. |
 | 👥 **Perfil do cliente** | Região, idade, tempo de casa e valor do pedido **não** mudam o NPS (todos ≈ −80). |
-| ✅ **Jornada perfeita** | Sem atraso e sem problemas no atendimento, o NPS é **+9**, mas só 3% dos clientes têm essa experiência. |
-| 💰 **Por que importa** | **Nenhum detrator recomprou em 30 dias.** Quem recomprou tem NPS de +50. |
+| ✅ **Jornada perfeita** | Sem atraso e sem problemas no atendimento, a nota média é **8,1** e o NPS fica em torno de **+9**. Mas só 3% dos clientes (77) têm essa experiência, e com tão poucos o NPS pode estar entre −8 e +27. |
+| 🔍 **Dado suspeito** | A coluna de recompra é **exatamente `nps_score >= 8`** em 100% dos pedidos: foi derivada da nota. Por isso **não** é usada como evidência de impacto financeiro. |
 
 <p align="center">
   <img src="reports/figures/03_06_ponto_ruptura_atraso.png" width="720" alt="Ponto de ruptura: % de detratores por dia de atraso">
@@ -65,27 +67,32 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 | | `csat_internal_score` | Score interno de satisfação |
 | **Alvo** | `nps_score` | Nota de NPS (0 a 10), coletada após a experiência de compra |
 
-\* Medidos **junto ou depois** do NPS. Não são usados como fatores explicativos, para evitar *data leakage* (vazamento de informação).
+\* Medidos **junto ou depois** do NPS. Não são usados como fatores explicativos, para evitar *data leakage* (vazamento de informação). Além disso, `repeat_purchase_30d` é uma **função exata da nota** (`nps_score >= 8` em 2.500 de 2.500 pedidos), o que indica base sintética; ver "Problema 3" abaixo.
 
 ## 4. Metodologia
 
 O projeto segue o **CRISP-DM**. Cada fase corresponde a um notebook:
 
-| Fase CRISP-DM | Notebook | O que faz |
+| Fase CRISP-DM | Onde está | O que faz |
 |---|---|---|
-| Entendimento do Negócio | [`01_entendimento_negocio`](notebooks/01_entendimento_negocio.ipynb) | Problema de negócio, importância do NPS, áreas beneficiadas, impacto em recompra, boca a boca e market share, definição da target e seus riscos |
-| Entendimento + Preparação dos Dados | [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb) | Qualidade dos dados, tratamento de inconsistências, outliers, regra de classificação do NPS e variáveis derivadas |
-| Análise Exploratória | [`03_eda`](notebooks/03_eda.ipynb) | Responde às 4 perguntas de negócio, com gráficos e textos voltados a gestores não técnicos |
+| 1. Entendimento do Negócio | [`01_entendimento_negocio`](notebooks/01_entendimento_negocio.ipynb) | Problema de negócio, importância do NPS, áreas beneficiadas, impacto em recompra, boca a boca e market share, definição da target e seus riscos |
+| 2. Entendimento dos Dados + 3. Preparação | [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb) | Qualidade dos dados, teste das regras do dicionário, tratamento de inconsistências, outliers, regra de classificação do NPS e variáveis derivadas |
+| 2. Entendimento dos Dados (EDA) | [`03_eda`](notebooks/03_eda.ipynb) | Responde às 4 perguntas de negócio, com gráficos e textos voltados a gestores não técnicos, mais uma regressão múltipla e testes estatísticos para sustentar as conclusões |
+| 4. Modelagem | *(não se aplica)* | O modelo preditivo (desafio opcional) não faz parte desta entrega |
+| 5. Avaliação + 6. Implantação | Final do [`03_eda`](notebooks/03_eda.ipynb) | Confronta as metas analíticas do notebook 01 com os resultados e propõe gatilhos operacionais (alerta no 1º dia de atraso, fila prioritária no SAC) com métricas de acompanhamento |
 
 ### Principais decisões de tratamento
 
 | Decisão | Justificativa |
 |---|---|
 | **Classificação do NPS por corte direto** (Detrator < 7 ≤ Neutro < 9 ≤ Promotor) | As notas têm casas decimais. Um 6,8 não chegou a 7. A alternativa de arredondar foi testada (NPS −74 contra −80) e a conclusão não muda. |
-| **Tempo de entrega corrigido** em 121 pedidos com atraso maior que o tempo total | Valor impossível. Corrigido por imputação pela mediana, sem excluir linhas. Detalhes abaixo. |
+| **Tempo de entrega corrigido** em 121 pedidos com atraso maior que o tempo total | Valor impossível na leitura literal do dicionário. Corrigido por imputação pela mediana, sem excluir linhas. Os valores imputados **ficam fora das análises de prazo** na EDA. Detalhes abaixo. |
+| **Leitura alternativa do dicionário registrada** | Prazo e atraso são colunas independentes nos dados; se `delivery_time_days` fosse o "prazo previsto", nenhuma linha seria inconsistente. Adotamos a definição oficial e documentamos a alternativa. |
 | **Desconto > valor do pedido** (35 pedidos) mantido | Faz sentido se o valor do pedido for líquido. Detalhes abaixo. |
 | **Outliers mantidos** | São casos reais (atrasos longos, muitos contatos) e justamente os mais relevantes para entender detratores. |
 | **CSAT e recompra fora dos fatores explicativos** | Evita *leakage*: essas informações não existem antes da pesquisa de NPS. |
+| **Recompra não usada nem como evidência** | A coluna é `nps_score >= 8` em 100% dos pedidos (derivada da nota). Qualquer "prova" de que detrator não recompra seria verdadeira por construção. |
+| **Cada fator analisado isoladamente** | As relações entre colunas não são confiáveis (há mais reclamações do que contatos em 97% dos pedidos). Nenhuma conclusão depende da relação entre duas colunas de operação. |
 
 ### Dados inconsistentes: o que encontramos e como tratamos
 
@@ -101,7 +108,9 @@ A base **não tem valores nulos nem linhas duplicadas**. O problema encontrado �
 | 50047 | 4 dias | 6 dias | Atraso 2 dias maior que a entrega inteira |
 | 50042 | 2 dias | 3 dias | Idem |
 
-**Qual das duas colunas está errada?** O **atraso** é coerente com o resto da linha: esses clientes deram notas muito baixas (média **2,3** contra **4,5** no resto da base), exatamente o que se espera de quem teve atraso longo. Então o valor suspeito é o **tempo total de entrega**.
+**A regra é mesmo a leitura certa?** Antes de corrigir, testamos o dicionário contra os dados. Prazo e atraso são **independentes** (correlação −0,007; atraso médio de ~2,2 dias em todo prazo, de 2 a 14 dias). Se o atraso fosse parte do tempo total, não seria assim. Existe uma leitura alternativa, `delivery_time_days` = **prazo previsto** e entrega real = prazo + atraso, em que nenhuma linha seria inconsistente. Mas na leitura literal 146 pedidos teriam "prazo prometido" de zero dias, tão impossível quanto os 121. Ou seja, nenhuma leitura é 100% consistente: **as colunas foram geradas de forma independente**. Adotamos a definição oficial do enunciado ("tempo total"), registramos a alternativa como limitação e, para que o valor estimado não crie um padrão artificial, **as linhas imputadas ficam fora das análises de prazo** na EDA. A conclusão de negócio não depende da escolha: nas duas leituras, o prazo tem relação ≈ 0 com a nota.
+
+**Qual das duas colunas tratar como errada?** A nota baixa desses clientes (média **2,3** contra **4,5**) é coerente com atraso alto em qualquer leitura. O que decide é a importância para o negócio: o atraso é o fator nº 1 da análise; corrigi-lo destruiria o dado que mais importa. Por isso o valor tratado é o **tempo total de entrega**.
 
 **As opções eram:**
 
@@ -123,13 +132,22 @@ O valor original foi **preservado** na coluna `delivery_time_days_original`, e a
 
 **Por que mantivemos:** existe uma leitura em que tudo faz sentido. Se `order_value` é o valor **já com o desconto aplicado** (o que o cliente efetivamente pagou), o preço cheio era R$ 41,29 + R$ 99,62 = **R$ 140,91**, e o desconto foi de 71%. Com essa interpretação, os 35 casos ficam coerentes e **nenhum valor precisa ser alterado**. O % de desconto passa a ser calculado sobre o valor bruto (`order_value + discount_value`), e as linhas ficam marcadas com `flag_inconsistencia_desconto`.
 
-O passo a passo completo, com o código, está na seção 5 do notebook [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb).
+#### Problema 3: a recompra é uma função exata da nota
+
+Antes de usar `repeat_purchase_30d` para mostrar que "detrator não recompra", testamos a coluna: ela é **exatamente `nps_score >= 8` em 2.500 de 2.500 pedidos** (menor nota de quem recomprou: 8,0; maior nota de quem não recomprou: 7,9). Dado real de comportamento nunca é assim. A coluna foi **derivada da própria nota**, e qualquer relação encontrada seria verdadeira por construção. Decisão: a recompra **não é usada como evidência**; o argumento de que satisfação gera recompra fica apoiado na literatura (Reichheld, 2003), e a recomendação é medir a recompra real nos próximos ciclos.
+
+#### Problema 4: relações entre colunas de atendimento
+
+Em **97% dos pedidos** há mais reclamações do que contatos com o atendimento, e em 20% há tempo de resolução sem nenhum contato. Ou "reclamação" é algo que não passa pelo SAC (ex.: avaliação pública), ou a base foi gerada coluna a coluna. Decisão: **não tratar**, analisar cada fator isoladamente e registrar como limitação.
+
+O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb).
 
 ### Limitações
 
 - A análise mostra **associação, não causalidade**. O ideal é validar as recomendações com testes controlados.
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
-- As notas com decimais e as inconsistências indicam possíveis diferenças na forma de coleta dos dados.
+- A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), colunas de prazo e atraso independentes, mais reclamações do que contatos e recompra derivada da nota. As **relações entre colunas** não são confiáveis; cada fator foi analisado isoladamente.
+- A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
 - O modelo preditivo (desafio opcional 4) **não** faz parte do escopo desta entrega.
 
 ## 5. Estrutura do repositório
@@ -143,9 +161,10 @@ O passo a passo completo, com o código, está na seção 5 do notebook [`02_pre
 │   ├── 02_preparacao_dados.ipynb
 │   └── 03_eda.ipynb
 ├── src/
-│   └── preparacao.py         # funções de carga, classificação do NPS e variáveis derivadas
+│   └── preparacao.py         # carga, classificação do NPS, faixas e variáveis derivadas (fonte única)
 ├── reports/
 │   └── figures/              # gráficos gerados pelos notebooks (usados nos slides)
+├── .gitignore                # exclui .venv, caches e material do curso
 ├── requirements.txt          # dependências para rodar a análise
 ├── requirements-dev.txt      # ferramentas de qualidade de código (Black, Flake8, pre-commit)
 ├── pyproject.toml            # configuração do Black
@@ -154,7 +173,7 @@ O passo a passo completo, com o código, está na seção 5 do notebook [`02_pre
 └── README.md
 ```
 
-A estrutura segue o padrão do template [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/): dados brutos separados dos tratados, notebooks numerados na ordem de execução e código reaproveitável em `src/`.
+A estrutura é inspirada no template [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/): dados brutos separados dos tratados, notebooks numerados na ordem de execução e código reaproveitável em `src/`. A pasta `data/processed/` é um artefato: é regenerada pelo notebook 02 e está versionada só para permitir abrir o notebook 03 direto.
 
 ## 6. Como reproduzir
 
@@ -162,8 +181,8 @@ A estrutura segue o padrão do template [Cookiecutter Data Science](https://cook
 
 ```bash
 # 1. Clonar o repositório
-git clone <url-do-repositorio>
-cd <pasta-do-repositorio>
+git clone https://github.com/CristovaoTorres/techchallenge-fase1-nps.git
+cd techchallenge-fase1-nps
 
 # 2. Criar e ativar um ambiente virtual
 python -m venv .venv
@@ -177,7 +196,7 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-Execute os notebooks **na ordem** `01 → 02 → 03`. O notebook `02` gera `data/processed/nps_tratado.csv`, que é lido pelo `03`. Todos os gráficos são salvos automaticamente em `reports/figures/`.
+Leia o notebook `01` (só texto) e execute **na ordem** `02 → 03`. O notebook `02` gera `data/processed/nps_tratado.csv`, que é lido pelo `03`. Todos os gráficos são salvos automaticamente em `reports/figures/`. A única etapa aleatória (bootstrap do intervalo de confiança) tem semente fixa: executar de novo gera exatamente os mesmos arquivos.
 
 Para rodar tudo de uma vez pela linha de comando:
 
@@ -186,21 +205,24 @@ cd notebooks
 jupyter nbconvert --to notebook --execute --inplace 02_preparacao_dados.ipynb 03_eda.ipynb
 ```
 
+O `--inplace` reescreve os notebooks com as saídas novas (o `git status` vai mostrá-los modificados, só por causa dos carimbos de tempo de execução). Para não tocar nos arquivos originais, troque por `--output-dir ../reports/`.
+
 ## 7. Boas práticas de código
 
 Além de funcionar, o código precisa ser fácil de ler, revisar e reproduzir por outra pessoa. Para isso, o projeto usa as ferramentas abaixo:
 
 | Ferramenta | O que faz | Por que usamos |
 |---|---|---|
-| **venv** + `requirements.txt` | Ambiente virtual isolado com versões fixas das bibliotecas | Qualquer pessoa instala exatamente as mesmas versões e obtém os mesmos resultados |
+| **venv** + `requirements.txt` | Ambiente virtual isolado com versões fixas das bibliotecas principais | Qualquer pessoa instala as mesmas versões de pandas, numpy, matplotlib, seaborn e scipy e obtém os mesmos resultados |
 | **[Black](https://black.readthedocs.io/)** | Formata o código automaticamente (scripts **e notebooks**) | Padroniza o estilo sem discussão manual: o código fica igual, não importa quem escreveu |
 | **[Flake8](https://flake8.pycqa.org/)** + **[nbQA](https://nbqa.readthedocs.io/)** | Verifica o código contra a **PEP 8** e aponta erros como variáveis não definidas e imports não usados | Encontra problemas antes de rodar. O nbQA permite aplicar o Flake8 também nos notebooks |
 | **[pre-commit](https://pre-commit.com/)** | Roda Black, Flake8 e verificações básicas (espaços sobrando, arquivos grandes) **a cada `git commit`** | Garante que nenhum código fora do padrão entre no repositório |
-| **Docstrings** e comentários | Toda função em `src/` explica o que faz. Os comentários explicam o *porquê* das decisões | Quem lê entende a intenção, não só o que o código faz |
+| **Docstrings** e comentários | Toda função em `src/` tem docstring com `Args` e `Returns`. Os comentários explicam o *porquê* das decisões, e todo limiar usado nos gráficos é uma constante nomeada com o motivo ao lado | Quem lê entende a intenção, não só o que o código faz |
+| **Fonte única de verdade** | Faixas, limiares de jornada e caminhos ficam em `src/preparacao.py`, importados pelos notebooks | Um rótulo alterado em um lugar só não quebra silenciosamente o outro |
 
 Principais escolhas de configuração:
 - **Linhas de até 100 caracteres** (em vez dos 79 da PEP 8): com nomes de variáveis em português, claros e descritivos, 79 caracteres quebrariam o código demais. Black e Flake8 usam o mesmo limite.
-- **E203 e W503 ignorados no Flake8**: são as duas regras que conflitam com a formatação do Black (recomendação oficial do próprio Black).
+- **E203 e E701 ignorados no Flake8**: são as regras que conflitam com a formatação do Black (recomendação da documentação do Black).
 - **`# noqa: E402` nos notebooks**: o `import` de `src/` precisa vir depois de adicionar a raiz do projeto ao `sys.path`. A exceção está marcada e justificada no código.
 
 Para usar as ferramentas:
@@ -215,4 +237,4 @@ pre-commit run --all-files    # roda tudo manualmente
 
 | Nome | RM |
 |---|---|
-| *(preencher)* | *(preencher)* |
+| Cristóvão Torres | *(preencher)* |
