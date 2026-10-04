@@ -1,9 +1,18 @@
+# Ambientes virtuais e caches
 .venv/
+venv/
+env/
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
+*.egg-info/
+
+# Editores e sistema
+.vscode/
+.idea/
 .DS_Store
 
-# Material do curso (exclusivo do aluno) e planejamento interno
+# Material do curso (exclusivo do aluno) e planejamento interno.
+# Atenção: o padrão *.pdf também ignoraria figuras exportadas em PDF.
 *.pdf
 ROADMAP.md

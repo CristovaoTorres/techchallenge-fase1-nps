@@ -1,0 +1,5 @@
+# Fim de linha igual em qualquer sistema operacional
+* text=auto eol=lf
+*.png binary
+*.csv text
+*.ipynb text

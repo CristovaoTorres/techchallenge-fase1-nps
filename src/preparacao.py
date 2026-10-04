@@ -1,9 +1,10 @@
 """Funções de carga e preparação da base de NPS.
 
 Ficam aqui (e não só no notebook) para que o tratamento seja o mesmo
-em todos os notebooks do projeto (preparação e EDA). Todas as faixas e
-limiares usados nas análises estão definidos neste módulo, em um único
-lugar, para que notebook e CSV nunca fiquem com rótulos diferentes.
+em todos os notebooks do projeto (preparação e EDA). As faixas, os limiares
+de classificação (NPS, jornada) e as rotinas estatísticas reutilizadas
+(regressão, bootstrap) ficam neste módulo, em um único lugar, para que
+notebook e CSV nunca fiquem com rótulos ou cálculos diferentes.
 """
 
 from pathlib import Path
@@ -104,6 +105,9 @@ def carregar_base_tratada(caminho: Path = CAMINHO_BASE_TRATADA) -> pd.DataFrame:
     )
     for coluna, ordem in ordens.items():
         df[coluna] = pd.Categorical(df[coluna], categories=ordem, ordered=True)
+        # Um rótulo do CSV fora da lista viraria NaN em silêncio (ex.: FAIXAS alterado
+        # sem regerar o CSV). Melhor falhar aqui do que produzir gráficos com buracos.
+        assert df[coluna].notna().all(), f"Rótulo fora da lista de categorias em '{coluna}'"
     return df
 
 
@@ -137,6 +141,52 @@ def calcular_nps(notas: pd.Series) -> float:
     pct_promotores = (notas >= LIMITE_PROMOTOR).mean()
     pct_detratores = (notas < LIMITE_NEUTRO).mean()
     return round(float(pct_promotores - pct_detratores) * 100, 1)
+
+
+def intervalo_confianca_nps(
+    notas: pd.Series, n_amostras: int = 2000, semente: int = 42
+) -> tuple[int, int]:
+    """Intervalo de 95% do NPS por bootstrap: reamostra os clientes e recalcula o NPS.
+
+    Com poucos clientes (ex.: 77), o NPS pode oscilar muito de uma amostra para outra.
+    O intervalo mostra a faixa em que o NPS "verdadeiro" do grupo provavelmente está.
+
+    Args:
+        notas: Notas de 0 a 10 dos clientes do grupo.
+        n_amostras: Quantidade de reamostragens.
+        semente: Semente do gerador aleatório, para o resultado ser reproduzível.
+
+    Returns:
+        Tupla ``(inferior, superior)`` com os percentis 2,5% e 97,5% do NPS, arredondados.
+    """
+    gerador = np.random.default_rng(semente)
+    valores = np.asarray(notas, dtype=float)
+    reamostras = gerador.choice(valores, size=(n_amostras, len(valores)), replace=True)
+    nps_amostras = [calcular_nps(amostra) for amostra in reamostras]
+    inferior, superior = np.percentile(nps_amostras, [2.5, 97.5])
+    return round(inferior), round(superior)
+
+
+def ajustar_regressao_linear(
+    dados: pd.DataFrame, alvo: str, preditoras: list[str]
+) -> tuple[np.ndarray, float]:
+    """Regressão linear múltipla por mínimos quadrados (sem bibliotecas de modelagem).
+
+    Args:
+        dados: Base com as colunas numéricas de ``alvo`` e ``preditoras``.
+        alvo: Coluna a prever.
+        preditoras: Colunas usadas para prever.
+
+    Returns:
+        Tupla ``(coeficientes, r2)``: ``coeficientes[0]`` é o intercepto e os demais seguem
+        a ordem de ``preditoras``; ``r2`` é a fração da variação do alvo explicada (0 a 1).
+    """
+    X = np.c_[np.ones(len(dados)), dados[preditoras].to_numpy(dtype=float)]  # 1s = intercepto
+    y = dados[alvo].to_numpy(dtype=float)
+    coeficientes, *_ = np.linalg.lstsq(X, y, rcond=None)
+    previsto = X @ coeficientes
+    r2 = 1 - ((y - previsto) ** 2).sum() / ((y - y.mean()) ** 2).sum()
+    return coeficientes, float(r2)
 
 
 def classificar_jornada(df: pd.DataFrame) -> pd.Categorical:
@@ -204,10 +254,9 @@ def criar_variaveis(df: pd.DataFrame) -> pd.DataFrame:
     # Pedido: peso do desconto e do frete.
     # Hipótese: order_value é o valor já com desconto (líquido). É a única leitura
     # em que os pedidos com desconto maior que order_value fazem sentido.
+    # Um pedido de valor zero (não há nenhum na base) ficaria sem %, em vez de dividir por zero
     valor_bruto = df["order_value"] + df["discount_value"]
-    df["pct_desconto"] = (df["discount_value"] / valor_bruto).round(3)
-    # Um pedido de valor zero (não há nenhum na base) ficaria sem % de frete, em vez de
-    # gerar divisão por zero
+    df["pct_desconto"] = (df["discount_value"] / valor_bruto.where(valor_bruto > 0)).round(3)
     df["pct_frete"] = (df["freight_value"] / df["order_value"].where(df["order_value"] > 0)).round(
         3
     )

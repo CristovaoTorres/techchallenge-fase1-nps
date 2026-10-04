@@ -92,7 +92,7 @@ O projeto segue o **CRISP-DM**. Cada fase corresponde a um notebook:
 | **Outliers mantidos** | São casos reais (atrasos longos, muitos contatos) e justamente os mais relevantes para entender detratores. |
 | **CSAT e recompra fora dos fatores explicativos** | Evita *leakage*: essas informações não existem antes da pesquisa de NPS. |
 | **Recompra não usada nem como evidência** | A coluna é `nps_score >= 8` em 100% dos pedidos (derivada da nota). Qualquer "prova" de que detrator não recompra seria verdadeira por construção. |
-| **Cada fator analisado isoladamente** | As relações entre colunas não são confiáveis (há mais reclamações do que contatos em 97% dos pedidos). Nenhuma conclusão depende da relação entre duas colunas de operação. |
+| **Nenhuma coluna corrige ou deriva outra** | As regras de consistência lógica entre colunas não valem (há mais reclamações do que contatos em 97% dos pedidos). As análises conjuntas (mapa de calor, regressão) usam a distribuição como está, com essa ressalva. |
 
 ### Dados inconsistentes: o que encontramos e como tratamos
 
@@ -138,7 +138,7 @@ Antes de usar `repeat_purchase_30d` para mostrar que "detrator não recompra", t
 
 #### Problema 4: relações entre colunas de atendimento
 
-Em **97% dos pedidos** há mais reclamações do que contatos com o atendimento, e em 20% há tempo de resolução sem nenhum contato. Ou "reclamação" é algo que não passa pelo SAC (ex.: avaliação pública), ou a base foi gerada coluna a coluna. Decisão: **não tratar**, analisar cada fator isoladamente e registrar como limitação.
+Em **97% dos pedidos** há mais reclamações do que contatos com o atendimento, e em 20% há tempo de resolução sem nenhum contato. Ou "reclamação" é algo que não passa pelo SAC (ex.: avaliação pública), ou a base foi gerada coluna a coluna. Decisão: **não tratar**, não usar nenhuma coluna para corrigir ou derivar outra, e registrar como limitação.
 
 O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb).
 
@@ -146,7 +146,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 
 - A análise mostra **associação, não causalidade**. O ideal é validar as recomendações com testes controlados.
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
-- A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), colunas de prazo e atraso independentes, mais reclamações do que contatos e recompra derivada da nota. As **relações entre colunas** não são confiáveis; cada fator foi analisado isoladamente.
+- A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), colunas de prazo e atraso independentes, mais reclamações do que contatos e recompra derivada da nota. As **regras de consistência lógica entre colunas** não valem; nenhuma coluna foi usada para corrigir ou derivar outra, e as análises conjuntas devem ser lidas com essa ressalva.
 - A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
 - O modelo preditivo (desafio opcional 4) **não** faz parte do escopo desta entrega.
 
@@ -161,9 +161,11 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 │   ├── 02_preparacao_dados.ipynb
 │   └── 03_eda.ipynb
 ├── src/
-│   └── preparacao.py         # carga, classificação do NPS, faixas e variáveis derivadas (fonte única)
+│   ├── __init__.py
+│   └── preparacao.py         # carga, classificação do NPS, faixas, regressão e bootstrap (fonte única)
 ├── reports/
 │   └── figures/              # gráficos gerados pelos notebooks (usados nos slides)
+├── .gitattributes            # fim de linha LF e arquivos binários, igual em qualquer sistema
 ├── .gitignore                # exclui .venv, caches e material do curso
 ├── requirements.txt          # dependências para rodar a análise
 ├── requirements-dev.txt      # ferramentas de qualidade de código (Black, Flake8, pre-commit)
@@ -183,6 +185,9 @@ A estrutura é inspirada no template [Cookiecutter Data Science](https://cookiec
 # 1. Clonar o repositório
 git clone https://github.com/CristovaoTorres/techchallenge-fase1-nps.git
 cd techchallenge-fase1-nps
+
+# (Windows: clone numa pasta de caminho curto, ex. C:\projetos, ou habilite "Long Paths".
+#  Uma dependência do Jupyter tem arquivos com nomes longos e o pip pode falhar.)
 
 # 2. Criar e ativar um ambiente virtual
 python -m venv .venv
