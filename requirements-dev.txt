@@ -1,0 +1,6 @@
+# Ferramentas de qualidade de código (não são necessárias para rodar a análise)
+-r requirements.txt
+black[jupyter]==26.10.0
+flake8==7.4.1
+nbqa==1.9.1
+pre-commit==4.6.2
