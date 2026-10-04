@@ -1,0 +1,6 @@
+[flake8]
+# Mesmo limite de linha do Black
+max-line-length = 100
+# E203 e W503 conflitam com a formatação do Black
+extend-ignore = E203, W503
+exclude = .venv, .git, __pycache__, .ipynb_checkpoints

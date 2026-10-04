@@ -146,9 +146,15 @@ O passo a passo completo, com o código, está na seção 5 do notebook [`02_pre
 │   └── preparacao.py         # funções de carga, classificação do NPS e variáveis derivadas
 ├── reports/
 │   └── figures/              # gráficos gerados pelos notebooks (usados nos slides)
-├── requirements.txt
+├── requirements.txt          # dependências para rodar a análise
+├── requirements-dev.txt      # ferramentas de qualidade de código (Black, Flake8, pre-commit)
+├── pyproject.toml            # configuração do Black
+├── .flake8                   # configuração do Flake8
+├── .pre-commit-config.yaml   # verificações automáticas a cada commit
 └── README.md
 ```
+
+A estrutura segue o padrão do template [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/): dados brutos separados dos tratados, notebooks numerados na ordem de execução e código reaproveitável em `src/`.
 
 ## 6. Como reproduzir
 
@@ -180,7 +186,32 @@ cd notebooks
 jupyter nbconvert --to notebook --execute --inplace 02_preparacao_dados.ipynb 03_eda.ipynb
 ```
 
-## 7. Autores
+## 7. Boas práticas de código
+
+Além de funcionar, o código precisa ser fácil de ler, revisar e reproduzir por outra pessoa. Para isso, o projeto usa as ferramentas abaixo:
+
+| Ferramenta | O que faz | Por que usamos |
+|---|---|---|
+| **venv** + `requirements.txt` | Ambiente virtual isolado com versões fixas das bibliotecas | Qualquer pessoa instala exatamente as mesmas versões e obtém os mesmos resultados |
+| **[Black](https://black.readthedocs.io/)** | Formata o código automaticamente (scripts **e notebooks**) | Padroniza o estilo sem discussão manual: o código fica igual, não importa quem escreveu |
+| **[Flake8](https://flake8.pycqa.org/)** + **[nbQA](https://nbqa.readthedocs.io/)** | Verifica o código contra a **PEP 8** e aponta erros como variáveis não definidas e imports não usados | Encontra problemas antes de rodar. O nbQA permite aplicar o Flake8 também nos notebooks |
+| **[pre-commit](https://pre-commit.com/)** | Roda Black, Flake8 e verificações básicas (espaços sobrando, arquivos grandes) **a cada `git commit`** | Garante que nenhum código fora do padrão entre no repositório |
+| **Docstrings** e comentários | Toda função em `src/` explica o que faz. Os comentários explicam o *porquê* das decisões | Quem lê entende a intenção, não só o que o código faz |
+
+Principais escolhas de configuração:
+- **Linhas de até 100 caracteres** (em vez dos 79 da PEP 8): com nomes de variáveis em português, claros e descritivos, 79 caracteres quebrariam o código demais. Black e Flake8 usam o mesmo limite.
+- **E203 e W503 ignorados no Flake8**: são as duas regras que conflitam com a formatação do Black (recomendação oficial do próprio Black).
+- **`# noqa: E402` nos notebooks**: o `import` de `src/` precisa vir depois de adicionar a raiz do projeto ao `sys.path`. A exceção está marcada e justificada no código.
+
+Para usar as ferramentas:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install            # ativa as verificações a cada commit
+pre-commit run --all-files    # roda tudo manualmente
+```
+
+## 8. Autores
 
 | Nome | RM |
 |---|---|
