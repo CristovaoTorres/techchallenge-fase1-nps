@@ -15,4 +15,5 @@ __pycache__/
 # Material do curso (exclusivo do aluno) e planejamento interno.
 # Atenção: o padrão *.pdf também ignoraria figuras exportadas em PDF.
 *.pdf
+!reports/slides/*.pdf
 ROADMAP.md
