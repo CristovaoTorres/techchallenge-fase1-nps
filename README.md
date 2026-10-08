@@ -78,7 +78,7 @@ O projeto segue o **CRISP-DM**. Cada fase corresponde a um notebook:
 | 1. Entendimento do Negócio | [`01_entendimento_negocio`](notebooks/01_entendimento_negocio.ipynb) | Problema de negócio, importância do NPS, áreas beneficiadas, impacto em recompra, boca a boca e market share, definição da target e seus riscos |
 | 2. Entendimento dos Dados + 3. Preparação | [`02_preparacao_dados`](notebooks/02_preparacao_dados.ipynb) | Qualidade dos dados, teste das regras do dicionário, tratamento de inconsistências, outliers, regra de classificação do NPS e variáveis derivadas |
 | 2. Entendimento dos Dados (EDA) | [`03_eda`](notebooks/03_eda.ipynb) | Responde às 4 perguntas de negócio, com gráficos e textos voltados a gestores não técnicos, mais uma regressão múltipla e testes estatísticos para sustentar as conclusões |
-| 4. Modelagem | *(não se aplica)* | O modelo preditivo (desafio opcional) não faz parte desta entrega |
+| 4. Modelagem | Seção 6 do [`03_eda`](notebooks/03_eda.ipynb) | Reflexão sobre o modelo preditivo (desafio opcional 4, não implementado): classificação de detrator, variáveis sem vazamento, separação, modelo, avaliação contra o chute trivial e uso em dois momentos da jornada |
 | 5. Avaliação + 6. Implantação | Final do [`03_eda`](notebooks/03_eda.ipynb) | Confronta as metas analíticas do notebook 01 com os resultados e propõe gatilhos operacionais (alerta no 1º dia de atraso, fila prioritária no SAC) com métricas de acompanhamento |
 
 ### Principais decisões de tratamento
@@ -148,7 +148,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
 - A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), colunas de prazo e atraso independentes, mais reclamações do que contatos e recompra derivada da nota. As **regras de consistência lógica entre colunas** não valem; nenhuma coluna foi usada para corrigir ou derivar outra, e as análises conjuntas devem ser lidas com essa ressalva.
 - A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
-- O modelo preditivo (desafio opcional 4) **não** faz parte do escopo desta entrega.
+- O modelo preditivo (desafio opcional 4) **não foi implementado**; a estratégia está descrita na seção 6 do notebook 03.
 
 ## 5. Estrutura do repositório
 
