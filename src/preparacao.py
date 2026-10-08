@@ -233,12 +233,12 @@ def criar_variaveis(df: pd.DataFrame) -> pd.DataFrame:
     """Adiciona as variáveis derivadas usadas na EDA. Não altera as colunas originais.
 
     Args:
-        df: Base (bruta ou já imputada) com as 19 colunas originais.
+        df: Base com as 19 colunas originais.
 
     Returns:
         Cópia de ``df`` com as colunas novas: ``nps_categoria``, ``flag_detrator``,
-        ``flag_atraso``, ``pct_desconto``, ``pct_frete``, as faixas de ``FAIXAS``,
-        ``faixa_valor_pedido`` e ``tipo_jornada``.
+        ``flag_atraso``, ``tempo_real_entrega_dias``, ``pct_desconto``, ``pct_frete``,
+        as faixas de ``FAIXAS``, ``faixa_valor_pedido`` e ``tipo_jornada``.
     """
     df = df.copy()
 
@@ -250,6 +250,9 @@ def criar_variaveis(df: pd.DataFrame) -> pd.DataFrame:
 
     # Logística: atrasou ou não (as faixas de atraso vêm de FAIXAS, abaixo)
     df["flag_atraso"] = (df["delivery_delay_days"] > 0).astype(int)
+    # delivery_time_days é o prazo PREVISTO e o atraso é contado a partir dele
+    # (notebook 02, seção 5.1), então o cliente esperou prazo + atraso
+    df["tempo_real_entrega_dias"] = df["delivery_time_days"] + df["delivery_delay_days"]
 
     # Pedido: peso do desconto e do frete.
     # Hipótese: order_value é o valor já com desconto (líquido). É a única leitura

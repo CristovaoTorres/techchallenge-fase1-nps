@@ -29,7 +29,7 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 | 🚚 **Fator nº 1** | **Atraso na entrega.** Sem atraso: 52% de detratores. Com 3+ dias: **97–100%**. |
 | ⏱️ **Ponto de ruptura** | **A nota cai ~1 ponto por dia de atraso, desde o 1º dia.** A partir do **3º dia**, 97%+ já são detratores. A ação precisa começar no 1º dia. |
 | 📐 **Quanto pesa cada um** | Os 4 fatores juntos explicam **56%** da variação da nota. Cada dia de atraso custa 1 ponto; cada reclamação, 0,4; cada contato a mais, 0,3. |
-| 📦 **Prazo ≠ atraso** | O prazo total de entrega **não** afeta a nota. O que pesa é **quebrar a promessa**. |
+| 📦 **Prazo ≠ atraso** | O prazo prometido de entrega **não** afeta a nota. O que pesa é **quebrar a promessa**. |
 | 📞 **Atendimento** | Reclamações e contatos repetidos derrubam a nota: 3+ contatos = 95% de detratores. |
 | 👥 **Perfil do cliente** | Região, idade, tempo de casa e valor do pedido **não** mudam o NPS (todos ≈ −80). |
 | ✅ **Jornada perfeita** | Sem atraso e sem problemas no atendimento, a nota média é **8,1** e o NPS fica em torno de **+9**. Mas só 3% dos clientes (77) têm essa experiência, e com tão poucos o NPS pode estar entre −8 e +27. |
@@ -56,8 +56,8 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 | | `items_quantity` | Quantidade de itens |
 | | `discount_value` | Valor de desconto aplicado |
 | | `payment_installments` | Número de parcelas |
-| Logística | `delivery_time_days` | Tempo total de entrega (dias) |
-| | `delivery_delay_days` | Dias de atraso na entrega |
+| Logística | `delivery_time_days` | Prazo previsto de entrega (dias). O dicionário diz "tempo total"; ver "Problema 1" abaixo |
+| | `delivery_delay_days` | Dias de atraso em relação ao prazo previsto |
 | | `freight_value` | Valor do frete |
 | | `delivery_attempts` | Tentativas de entrega |
 | Atendimento | `customer_service_contacts` | Contatos com o atendimento |
@@ -86,45 +86,37 @@ O projeto segue o **CRISP-DM**. Cada fase corresponde a um notebook:
 | Decisão | Justificativa |
 |---|---|
 | **Classificação do NPS por corte direto** (Detrator < 7 ≤ Neutro < 9 ≤ Promotor) | As notas têm casas decimais. Um 6,8 não chegou a 7. A alternativa de arredondar foi testada (NPS −74 contra −80) e a conclusão não muda. |
-| **Tempo de entrega corrigido** em 121 pedidos com atraso maior que o tempo total | Valor impossível na leitura literal do dicionário. Corrigido por imputação pela mediana, sem excluir linhas. Os valores imputados **ficam fora das análises de prazo** na EDA. Detalhes abaixo. |
-| **Leitura alternativa do dicionário registrada** | Prazo e atraso são colunas independentes nos dados; se `delivery_time_days` fosse o "prazo previsto", nenhuma linha seria inconsistente. Adotamos a definição oficial e documentamos a alternativa. |
+| **`delivery_time_days` lido como prazo previsto**, nenhum valor alterado | Em 121 pedidos o atraso é maior que o "tempo total" do dicionário. Os dados e o professor confirmam que a coluna é o prazo previsto, e o atraso é contado a partir dele: não há erro. A leitura literal, com imputação, foi feita como teste de sensibilidade e leva às mesmas conclusões. Detalhes abaixo. |
 | **Desconto > valor do pedido** (35 pedidos) mantido | Faz sentido se o valor do pedido for líquido. Detalhes abaixo. |
 | **Outliers mantidos** | São casos reais (atrasos longos, muitos contatos) e justamente os mais relevantes para entender detratores. |
 | **CSAT e recompra fora dos fatores explicativos** | Evita *leakage*: essas informações não existem antes da pesquisa de NPS. |
 | **Recompra não usada nem como evidência** | A coluna é `nps_score >= 8` em 100% dos pedidos (derivada da nota). Qualquer "prova" de que detrator não recompra seria verdadeira por construção. |
-| **Nenhuma coluna corrige ou deriva outra** | As regras de consistência lógica entre colunas não valem (há mais reclamações do que contatos em 97% dos pedidos). As análises conjuntas (mapa de calor, regressão) usam a distribuição como está, com essa ressalva. |
+| **Nenhuma coluna corrige outra** | A regra de consistência lógica entre as colunas de atendimento não vale (há mais reclamações do que contatos em 97% dos pedidos). As análises conjuntas (mapa de calor, regressão) usam a distribuição como está, com essa ressalva. |
 
 ### Dados inconsistentes: o que encontramos e como tratamos
 
 A base **não tem valores nulos nem linhas duplicadas**. O problema encontrado é outro: **valores que existem, mas são logicamente impossíveis** quando comparamos uma coluna com outra.
 
-#### Problema 1: atraso maior que o tempo total de entrega (121 pedidos, 4,8% da base)
+#### Problema 1: atraso maior que o "tempo total" de entrega (121 pedidos, 4,8% da base): ambiguidade do dicionário, não erro
 
-**O que está errado:** pelo dicionário de dados, `delivery_time_days` é o **tempo total** da entrega e `delivery_delay_days` são os **dias de atraso**. O atraso é uma **parte** do tempo total, então nunca poderia ser maior que ele. Mesmo assim, há 121 pedidos assim:
+**O que parecia errado:** o dicionário de dados descreve `delivery_time_days` como **tempo total** de entrega e `delivery_delay_days` como **dias de atraso**. Nessa leitura literal, o atraso seria uma **parte** do tempo total e nunca poderia ser maior que ele. Mesmo assim, há 121 pedidos assim:
 
-| order_id | Tempo total de entrega | Dias de atraso | Por que é impossível |
+| order_id | `delivery_time_days` | Dias de atraso | Na leitura literal |
 |---|---|---|---|
 | 50006 | 4 dias | 5 dias | A entrega levou 4 dias no total, mas atrasou 5? |
 | 50047 | 4 dias | 6 dias | Atraso 2 dias maior que a entrega inteira |
 | 50042 | 2 dias | 3 dias | Idem |
 
-**A regra é mesmo a leitura certa?** Antes de corrigir, testamos o dicionário contra os dados. Prazo e atraso são **independentes** (correlação −0,007; atraso médio de ~2,2 dias em todo prazo, de 2 a 14 dias). Se o atraso fosse parte do tempo total, não seria assim. Existe uma leitura alternativa, `delivery_time_days` = **prazo previsto** e entrega real = prazo + atraso, em que nenhuma linha seria inconsistente. Mas na leitura literal 146 pedidos teriam "prazo prometido" de zero dias, tão impossível quanto os 121. Ou seja, nenhuma leitura é 100% consistente: **as colunas foram geradas de forma independente**. Adotamos a definição oficial do enunciado ("tempo total"), registramos a alternativa como limitação e, para que o valor estimado não crie um padrão artificial, **as linhas imputadas ficam fora das análises de prazo** na EDA. A conclusão de negócio não depende da escolha: nas duas leituras, o prazo tem relação ≈ 0 com a nota.
+**Erro ou leitura errada?** Antes de tratar, testamos o dicionário contra os dados. Existe uma segunda leitura: `delivery_time_days` = **prazo previsto** e `delivery_delay_days` = atraso **em relação a esse prazo**, com entrega real = prazo + atraso. Os dados favorecem essa leitura:
 
-**Qual das duas colunas tratar como errada?** A nota baixa desses clientes (média **2,3** contra **4,5**) é coerente com atraso alto em qualquer leitura. O que decide é a importância para o negócio: o atraso é o fator nº 1 da análise; corrigi-lo destruiria o dado que mais importa. Por isso o valor tratado é o **tempo total de entrega**.
+- Prazo e atraso são **independentes** (correlação −0,007; atraso médio de ~2,2 dias em todo prazo, de 2 a 14 dias). Se o atraso fosse parte do tempo total, prazos curtos teriam atrasos menores.
+- Na leitura literal, além dos 121 casos, outros 146 pedidos teriam "prazo prometido" de **zero dias**. Na leitura de prazo previsto, **nenhum** valor é impossível (entregas reais de 2 a 22 dias).
 
-**As opções eram:**
+**Confirmação do professor:** a mesma dúvida foi levada ao fórum do curso, e o Prof. Ariel Velardo esclareceu (05/10/2026) que `delivery_time_days` pode ser lido como o **prazo estimado** e `delivery_delay_days` como o atraso em relação a ele, e que a descrição "tempo total de entrega" ficou ambígua no dicionário.
 
-| Opção | Consequência | Decisão |
-|---|---|---|
-| **Excluir as 121 linhas** | Perderíamos o pedido inteiro (atraso, atendimento, nota), e justamente o grupo **mais insatisfeito** da base. A análise ficaria otimista e subestimaria o impacto do atraso. | ❌ |
-| **Manter como está** | Qualquer análise de prazo usaria um valor que não pode ser verdadeiro. | ❌ |
-| **Corrigir só a célula errada (imputação)** | Mantém o pedido e as outras 18 colunas, que estão corretas, e substitui apenas o tempo total de entrega por uma estimativa. | ✅ |
+**Decisão:** adotamos a leitura de **prazo previsto**. **Nenhum valor foi alterado** e as 2.500 linhas entram em todas as análises. Criamos `tempo_real_entrega_dias` (prazo + atraso), o tempo que o cliente de fato esperou.
 
-**Como estimamos o valor correto:**
-1. **Regressão linear múltipla** (prever o tempo de entrega a partir das outras colunas): **testada e descartada**. O R² foi de **0,017**, ou seja, as outras colunas explicam menos de 2% do tempo de entrega. A regressão devolveria praticamente a média.
-2. **Mediana** dos pedidos sem inconsistência (**8 dias**): ✅ **adotada**. Quando nenhuma outra informação ajuda a prever o valor, o valor típico é a estimativa mais honesta. Também garantimos que o tempo total nunca fique menor que o atraso.
-
-O valor original foi **preservado** na coluna `delivery_time_days_original`, e a linha fica marcada com `flag_inconsistencia_prazo`, para que qualquer pessoa possa conferir ou reverter.
+**Teste de sensibilidade (e se a leitura literal estivesse certa?):** nesse caso, os 121 valores seriam impossíveis. Excluir as linhas descartaria justamente o grupo mais insatisfeito (nota média **2,3** contra **4,5**), então a saída seria **imputar** só a célula errada. A regressão linear para estimar o valor foi testada e descartada (R² de **0,017**), e a imputação seria pela **mediana** (8 dias). Refizemos a análise com essa base imputada: o prazo continua sem relação com a nota (correlação entre −0,07 e 0,00 nas três versões) e a coluna de atraso não muda. **Nenhuma conclusão depende da leitura.** O passo a passo está nas seções 5.1 e 5.2 do notebook 02.
 
 #### Problema 2: desconto maior que o valor do pedido (35 pedidos, 1,4% da base)
 
@@ -146,7 +138,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 
 - A análise mostra **associação, não causalidade**. O ideal é validar as recomendações com testes controlados.
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
-- A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), colunas de prazo e atraso independentes, mais reclamações do que contatos e recompra derivada da nota. As **regras de consistência lógica entre colunas** não valem; nenhuma coluna foi usada para corrigir ou derivar outra, e as análises conjuntas devem ser lidas com essa ressalva.
+- A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), mais reclamações do que contatos e recompra derivada da nota. Nem todas as **regras de consistência lógica entre colunas** valem; nenhuma coluna foi usada para corrigir outra, e as análises conjuntas devem ser lidas com essa ressalva.
 - A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
 - O modelo preditivo (desafio opcional 4) **não foi implementado**; a estratégia está descrita na seção 6 do notebook 03.
 
