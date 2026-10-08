@@ -7,7 +7,7 @@ Análise de dados operacionais de um e-commerce (pedidos, logística e atendimen
 | Entregável | Link |
 |---|---|
 | 📓 Notebooks (entendimento, preparação e EDA) | [`notebooks/`](notebooks/) |
-| 📊 Slides (storytelling gerencial) | 🚧 em produção |
+| 📊 Slides (storytelling gerencial) | [`reports/slides/nps_preditivo_slides.pdf`](reports/slides/nps_preditivo_slides.pdf) |
 | 🎥 Vídeo executivo (até 5 min) | 🚧 em produção |
 
 ---
@@ -164,7 +164,8 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 │   ├── __init__.py
 │   └── preparacao.py         # carga, classificação do NPS, faixas, regressão e bootstrap (fonte única)
 ├── reports/
-│   └── figures/              # gráficos gerados pelos notebooks (usados nos slides)
+│   ├── figures/              # gráficos gerados pelos notebooks (usados nos slides)
+│   └── slides/               # apresentação para público não técnico (PDF)
 ├── .gitattributes            # fim de linha LF e arquivos binários, igual em qualquer sistema
 ├── .gitignore                # exclui .venv, caches e material do curso
 ├── requirements.txt          # dependências para rodar a análise
