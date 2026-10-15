@@ -139,6 +139,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 - A análise mostra **associação, não causalidade**. O ideal é validar as recomendações com testes controlados.
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
 - A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), mais reclamações do que contatos e recompra derivada da nota. Nem todas as **regras de consistência lógica entre colunas** valem; nenhuma coluna foi usada para corrigir outra, e as análises conjuntas devem ser lidas com essa ressalva.
+- A base **não traz dados de concorrentes**. Como ordem de grandeza, o NPS médio do e-commerce no Brasil é **64** ([Opinion Box](https://www.opinionbox.com/voz-do-cliente/segmentos-avaliados/e-commerce-e-marketplaces/)) e a mediana global de varejo e e-commerce é **55** ([Survicate, 2025](https://survicate.com/nps-benchmarks/)). Os −80 desta base estão muito abaixo, mas, por ser sintética, a comparação não diz que "a empresa está atrás da concorrência".
 - A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
 - O modelo preditivo (desafio opcional 4) **não foi implementado**; a estratégia está descrita na seção 6 do notebook 03.
 
