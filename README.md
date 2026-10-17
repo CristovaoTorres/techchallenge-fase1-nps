@@ -25,7 +25,7 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 
 | | Achado |
 |---|---|
-| 🚨 **Retrato** | NPS de **−80**: 84% dos clientes são detratores e só 4% são promotores. **9 em cada 10 pedidos chegam atrasados** e **9 em cada 10 clientes registram 2+ reclamações**. |
+| 🚨 **Retrato** | NPS de **−80** (intervalo de 95%: −82 a −78): 84% dos clientes são detratores e só 4% são promotores. **9 em cada 10 pedidos chegam atrasados** e **9 em cada 10 clientes registram 2+ reclamações**. |
 | 🚚 **Fator nº 1** | **Atraso na entrega.** Sem atraso: 52% de detratores. Com 3+ dias: **97–100%**. |
 | ⏱️ **Ponto de ruptura** | **A nota cai ~1 ponto por dia de atraso, desde o 1º dia.** A partir do **3º dia**, 97%+ já são detratores. A ação precisa começar no 1º dia. |
 | 📐 **Quanto pesa cada um** | Os 4 fatores juntos explicam **56%** da variação da nota. Cada dia de atraso custa 1 ponto; cada reclamação, 0,4; cada contato a mais, 0,3. |
@@ -34,7 +34,8 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 | ⚖️ **O atraso não basta sozinho** | O atraso é a maior alavanca (a parte da nota que só ele explica é ~10× a das reclamações), mas **entre os pedidos entregues no prazo o NPS ainda é −34**, por causa das reclamações (72% deles reclamaram 2+ vezes). No prazo **e** com até 1 reclamação, o NPS vai a **+9**. Na simulação, zerar o atraso leva o NPS a ≈ −49; resolver atraso e reclamações juntos, a ≈ −13. |
 | 👥 **Perfil do cliente** | Região, idade, tempo de casa e valor do pedido **não** mudam o NPS (todos ≈ −80). |
 | ✅ **Jornada perfeita** | Sem atraso e sem problemas no atendimento, a nota média é **8,1** e o NPS fica em torno de **+9**. Mas só 3% dos clientes (77) têm essa experiência, e com tão poucos o NPS pode estar entre −8 e +27. |
-| 🔍 **Dado suspeito** | A coluna de recompra é **exatamente `nps_score >= 8`** em 100% dos pedidos: foi derivada da nota. Por isso **não** é usada como evidência de impacto financeiro. |
+| 📊 **Quem pesa mais nos detratores** | Pedidos com **3+ dias de atraso** são 38% da base e concentram **45% dos detratores** (98% deles insatisfeitos). **4+ reclamações** atinge 63% dos clientes e 70% dos detratores. Entrega e atendimento, nesses limiares, cobrem 83% dos detratores. |
+| 🔍 **Dado suspeito** | A coluna de recompra é **exatamente `nps_score >= 8`** em 100% dos pedidos: foi derivada da nota. Por isso **não** é usada como evidência de impacto financeiro. O vazamento em números: incluí-la na regressão sobe o R² de **56% para 64%**, um ganho falso, porque na hora de prever a coluna não existe. |
 
 <p align="center">
   <img src="reports/figures/03_06_ponto_ruptura_atraso.png" width="720" alt="Ponto de ruptura: % de detratores por dia de atraso">
