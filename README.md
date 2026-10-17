@@ -161,7 +161,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 ├── reports/
 │   ├── figures/              # gráficos gerados pelos notebooks
 │   │   └── slides/           # os mesmos gráficos sem o título interno, para colar nos slides
-│   └── slides/               # apresentação para público não técnico (PDF)
+│   └── slides/               # apresentação para público não técnico (PDF) e o HTML que a gera
 ├── .gitattributes            # fim de linha LF e arquivos binários, igual em qualquer sistema
 ├── .gitignore                # exclui .venv, caches e material do curso
 ├── requirements.txt          # dependências para rodar a análise
