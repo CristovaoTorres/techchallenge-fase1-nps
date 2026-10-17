@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>NPS Preditivo</title>
+<!-- Fonte do deck. Para gerar o PDF, ver o comentário no fim do arquivo. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fundo: #FAF8F4;
+    --texto: #2B2B2B;
+    --apagado: #6E6E6E;
+    --vermelho: #D1495B;
+    --verde: #2E9E6B;
+    --cinza: #7A7D80;
+    --cartao: #F0EDE6;
+    --cartao-rosa: #F8E5E8;
+    --cartao-branco: #FFFEFC;
+    --escuro: #2B2B2B;
+    --escuro-cartao: #3A3A3A;
+  }
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--fundo); }
+  body {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    color: var(--texto);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .slide {
+    width: 1280px; height: 720px; position: relative; overflow: hidden;
+    padding: 64px 85px 0; background: var(--fundo);
+    break-after: page; page-break-after: always;
+    display: flex; flex-direction: column;
+  }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .rotulo { color: var(--vermelho); font-weight: 600; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-size: 38px; line-height: 1.18; font-weight: 700; letter-spacing: -.01em; max-width: 1110px; }
+  h1 em, .destaque { color: var(--vermelho); font-style: normal; }
+  h1 .verde, .verde { color: var(--verde); }
+  .rodape {
+    position: absolute; left: 85px; right: 85px; bottom: 34px;
+    display: flex; justify-content: space-between; gap: 24px;
+    font-size: 15.5px; color: var(--apagado);
+  }
+  .corpo { flex: 1; display: flex; gap: 26px; margin-top: 30px; margin-bottom: 92px; min-height: 0; }
+  .cartao { background: var(--cartao); border-radius: 18px; padding: 28px 30px; }
+  .cartao.rosa { background: var(--cartao-rosa); }
+  .cartao.branco { background: var(--cartao-branco); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .cartao.branco img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .lateral { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .numero { font-size: 66px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+  .numero.medio { font-size: 52px; }
+  .legenda { font-size: 17.5px; line-height: 1.4; color: var(--apagado); margin-top: 6px; }
+  .legenda.forte { color: var(--texto); }
+  .lateral h3 { font-size: 21px; font-weight: 700; }
+  .lateral p { font-size: 17.5px; line-height: 1.45; color: var(--apagado); }
+
+  /* Capa */
+  .capa { padding-top: 100px; }
+  .capa h1 { font-size: 62px; line-height: 1.1; max-width: 700px; margin-top: 70px; }
+  .capa .sub { font-size: 21px; line-height: 1.5; color: var(--apagado); max-width: 690px; margin-top: 26px; }
+  .capa .kpi { position: absolute; right: 85px; top: 212px; width: 348px; height: 274px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .capa .kpi .numero { font-size: 120px; color: var(--vermelho); }
+  .capa .kpi .legenda { font-size: 19px; }
+  .capa .kpi .legenda.forte { font-weight: 600; margin-top: 14px; }
+
+  /* Grades de cartões */
+  .grade { display: grid; gap: 22px; width: 100%; }
+  .grade.tres { grid-template-columns: repeat(3, 1fr); }
+  .grade.duas { grid-template-columns: repeat(2, 1fr); }
+  .grade .cartao h3 { font-size: 22px; line-height: 1.25; font-weight: 700; margin-bottom: 12px; }
+  .grade .cartao p { font-size: 17px; line-height: 1.5; color: var(--apagado); }
+  .indice { color: var(--vermelho); font-size: 44px; font-weight: 800; margin-bottom: 18px; }
+
+  /* Jornada (pergunta) */
+  .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: auto; }
+  .etapas .cartao { padding: 22px 24px; }
+  .etapas small { color: var(--vermelho); font-weight: 600; font-size: 16px; }
+  .etapas h3 { font-size: 23px; margin: 6px 0 6px; }
+  .etapas p { font-size: 16px; color: var(--apagado); line-height: 1.4; }
+  .nota-etapas { font-size: 17.5px; color: var(--apagado); margin: 14px 0 100px; }
+
+  /* Ações e limitações */
+  .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+  .acao { display: flex; gap: 20px; align-items: flex-start; padding: 20px 26px; }
+  .acao .n { color: var(--vermelho); font-size: 36px; font-weight: 800; line-height: 1; width: 26px; flex-shrink: 0; }
+  .acao h3 { font-size: 19.5px; line-height: 1.3; font-weight: 700; margin-bottom: 6px; }
+  .acao p { font-size: 15.5px; line-height: 1.45; color: var(--apagado); }
+  .acao.nova { background: var(--cartao-rosa); }
+  .acao.larga { grid-column: 1 / -1; }
+
+  /* Modelo */
+  .fluxo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .fluxo .cartao { padding: 18px 22px; font-size: 17px; line-height: 1.4; }
+  .fluxo b { color: var(--vermelho); display: block; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .pergunta-modelo { font-size: 24px; line-height: 1.4; font-weight: 600; border-left: 5px solid var(--vermelho); padding: 4px 0 4px 22px; margin-top: 26px; }
+
+  /* Fechamento */
+  .fechamento { background: var(--escuro); color: #F7F5F0; padding-top: 100px; }
+  .fechamento h1 { font-size: 64px; line-height: 1.12; color: #F7F5F0; max-width: 1000px; }
+  .fechamento .sub { font-size: 21px; line-height: 1.5; color: #CFCBC4; margin-top: 30px; max-width: 1020px; }
+  .fechamento .rotulo { color: #EC8A97; }
+  .fechamento .grade { position: absolute; left: 85px; right: 85px; bottom: 60px; width: auto; }
+  .fechamento .cartao { background: var(--escuro-cartao); }
+  .fechamento .cartao .rotulo { font-size: 15px; margin-bottom: 8px; }
+  .fechamento .cartao p { color: #F7F5F0; font-size: 17px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Capa -->
+<section class="slide capa">
+  <div class="rotulo">NPS Preditivo · Tech Challenge · Fase 1</div>
+  <h1>O que faz um cliente de e-commerce virar detrator?</h1>
+  <p class="sub">O que 2.500 pedidos revelam sobre a satisfação do cliente, e como agir antes da pesquisa de NPS.</p>
+  <div class="cartao rosa kpi">
+    <div class="numero">−80</div>
+    <div class="legenda forte">NPS da empresa hoje</div>
+    <div class="legenda">84% de detratores</div>
+  </div>
+  <div class="rodape"><span style="color:var(--texto)">Cristóvão Torres</span><span>FIAP Pós-Tech · AI Scientist · Outubro de 2026</span></div>
+</section>
+
+<!-- 2 · Contexto -->
+<section class="slide">
+  <h1>Pedidos parecidos, notas muito diferentes: a satisfação virou uma loteria</h1>
+  <div class="corpo" style="margin-bottom:0">
+    <div class="grade tres" style="align-self:flex-start">
+      <div class="cartao"><div class="indice">01</div><h3>Ninguém sabe o que decide a nota</h3><p>A empresa cresceu rápido. Com indicadores operacionais parecidos, uns clientes viram promotores e outros, detratores.</p></div>
+      <div class="cartao"><div class="indice">02</div><h3>A nota chega tarde demais</h3><p>O NPS é coletado depois da entrega. Quando a empresa descobre a insatisfação, a experiência ruim já aconteceu.</p></div>
+      <div class="cartao"><div class="indice">03</div><h3>Onde investir primeiro?</h3><p>Logística, atendimento, preço, frete: sem saber o que pesa, cada área puxa para um lado.</p></div>
+    </div>
+  </div>
+  <div class="cartao rosa" style="margin:22px 0 100px; padding:20px 30px; font-size:18.5px; line-height:1.5">
+    <b>Por que isso importa:</b> no e-commerce, trocar de loja custa um clique. O cliente insatisfeito não volta a comprar e fala mal da marca em público, e isso pesa direto na recompra e na conquista de novos clientes.
+  </div>
+  <div class="rodape"><span>Contexto do problema de negócio</span><span>2</span></div>
+</section>
+
+<!-- 3 · Pergunta -->
+<section class="slide">
+  <div class="rotulo">A pergunta da análise</div>
+  <h1 style="font-size:44px">Quais fatores da operação derrubam a satisfação do cliente, e como agir <em>antes</em> da pesquisa de NPS?</h1>
+  <div class="etapas">
+    <div class="cartao"><small>Etapa 1</small><h3>Compra</h3><p>valor, itens, desconto, parcelas</p></div>
+    <div class="cartao"><small>Etapa 2</small><h3>Entrega</h3><p>prazo, atraso, frete, tentativas</p></div>
+    <div class="cartao"><small>Etapa 3</small><h3>Atendimento</h3><p>contatos, reclamações, tempo de resolução</p></div>
+    <div class="cartao rosa"><small>Etapa 4</small><h3>Pesquisa de NPS</h3><p>a nota, de 0 a 10. Chega por último</p></div>
+  </div>
+  <p class="nota-etapas">Tudo o que acontece nas etapas 1 a 3 fica registrado antes de a nota existir. É isso que permite agir cedo.</p>
+  <div class="rodape"><span>Pergunta orientadora</span><span>3</span></div>
+</section>
+
+<!-- 4 · Retrato -->
+<section class="slide">
+  <h1><em>84 de cada 100</em> clientes saem insatisfeitos. O NPS da empresa é −80</h1>
+  <div class="corpo">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_01_retrato_nps.png" alt="Distribuição: 84% detratores, 11% neutros, 4% promotores"></div>
+    <div class="cartao lateral">
+      <div><div class="numero medio destaque">9 em 10</div><div class="legenda">pedidos chegam <b style="color:var(--texto)">atrasados</b> (só 11% no prazo)</div></div>
+      <div><div class="numero medio destaque">9 em 10</div><div class="legenda">clientes registram <b style="color:var(--texto)">2 ou mais reclamações</b></div></div>
+    </div>
+  </div>
+  <div class="rodape"><span>Referência de NPS: e-commerce Brasil 64 (Opinion Box) · varejo e e-commerce global 55 (Survicate, 2025)</span><span>4</span></div>
+</section>
+
+<!-- 5 · Fatores -->
+<section class="slide">
+  <h1>Só <em>4 fatores</em> mexem com a nota, e todos acontecem depois do clique em “comprar”</h1>
+  <div class="corpo">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_02_ranking_fatores.png" alt="Ranking da força da relação de cada fator com a nota"></div>
+    <div class="cartao rosa lateral">
+      <div><div class="numero destaque">56%</div><div class="legenda forte">da variação da nota é explicada pelos 4 fatores juntos</div></div>
+      <p><b style="color:var(--texto)">O atraso é o maior de todos.</b> Preço, frete, desconto, parcelas, idade e região: praticamente nenhuma influência.</p>
+    </div>
+  </div>
+  <div class="rodape"><span>Barra maior = fator que mais mexe com a nota (0 = nenhuma relação, 1 = total)</span><span>5</span></div>
+</section>
+
+<!-- 6 · Prazo x atraso -->
+<section class="slide">
+  <h1>O cliente aceita esperar. O que ele não aceita é a <em>promessa quebrada</em></h1>
+  <div class="corpo" style="flex-direction:column; gap:18px">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_03_prazo_vs_atraso.png" alt="Nota média por prazo prometido e por dias de atraso"></div>
+    <div class="grade duas" style="gap:18px">
+      <div class="cartao" style="padding:16px 24px; font-size:17.5px"><b>Prazo prometido:</b> <span style="color:var(--apagado)">de 2 ou de 14 dias, a nota média fica entre 4,2 e 4,7.</span></div>
+      <div class="cartao rosa" style="padding:16px 24px; font-size:17.5px"><b class="destaque">Atraso:</b> <span style="color:var(--apagado)">de 6,9 no prazo para 1,3 com 5+ dias de atraso.</span></div>
+    </div>
+  </div>
+  <div class="rodape"><span>A lição: prometer um prazo que dá para cumprir, não necessariamente entregar mais rápido</span><span>6</span></div>
+</section>
+
+<!-- 7 · Ruptura -->
+<section class="slide">
+  <h1>A nota cai <em>1 ponto por dia</em> de atraso. No 3º dia, 97% já são detratores</h1>
+  <div class="corpo">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_06_ponto_ruptura_atraso.png" alt="Nota média e % de detratores por dia de atraso"></div>
+  </div>
+  <div class="rodape"><span>A ação precisa começar no 1º dia de atraso. No 3º, recuperar o cliente fica muito mais difícil</span><span>7</span></div>
+</section>
+
+<!-- 8 · Atraso não basta (novo) -->
+<section class="slide">
+  <h1>Cumprir o prazo ajuda, mas não basta: no prazo, o NPS ainda é <em>−34</em></h1>
+  <div class="corpo">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_09_atraso_nao_basta.png" alt="NPS: todos −80, entregues no prazo −34, no prazo e até 1 reclamação +9"></div>
+    <div class="cartao lateral" style="width:330px">
+      <div><h3>Sem atraso, quem derruba a nota são as reclamações</h3><p style="margin-top:8px">Nos pedidos entregues no prazo, o NPS vai de <b class="verde">+9</b> (0–1 reclamação) a <b class="destaque">−83</b> (6 ou mais).</p></div>
+      <div><h3>Ainda não sabemos o motivo</h3><p style="margin-top:8px">A base só conta as reclamações. Produto, cobrança, atendimento? É o próximo dado a coletar.</p></div>
+    </div>
+  </div>
+  <div class="rodape"><span>O atraso é a maior alavanca, mas não a única: o NPS só fica positivo quando entrega e atendimento funcionam juntos</span><span>8</span></div>
+</section>
+
+<!-- 9 · Efeito combinado -->
+<section class="slide">
+  <h1>Os problemas se somam: a nota vai de <span class="verde">8,1</span> a <em>0,7</em></h1>
+  <div class="corpo">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_05_efeito_combinado.png" alt="Mapa de calor: nota média por atraso e nº de reclamações"></div>
+    <div class="cartao lateral">
+      <div><div class="numero verde">8,1</div><div class="legenda">no prazo e com até 1 reclamação</div></div>
+      <div><div class="numero destaque">0,7</div><div class="legenda">5+ dias de atraso e 6+ reclamações</div></div>
+    </div>
+  </div>
+  <div class="rodape"><span>Resolver um dos problemas já ajuda; o maior ganho vem de atacar os dois juntos</span><span>9</span></div>
+</section>
+
+<!-- 10 · Perfil do cliente -->
+<section class="slide">
+  <h1>Não existe “cliente difícil”. Existe <em>jornada ruim</em></h1>
+  <div class="corpo" style="flex-direction:column; gap:18px">
+    <div class="cartao branco" style="flex:1"><img src="../figures/slides/03_07_perfil_cliente.png" alt="NPS por região, idade, tempo como cliente e valor do pedido: todos perto de −80"></div>
+    <div class="grade duas" style="gap:18px">
+      <div class="cartao" style="padding:16px 24px; font-size:17.5px"><b>≈ −80 em todos os perfis:</b> <span style="color:var(--apagado)">região, idade, tempo de casa e valor do pedido não mudam o NPS.</span></div>
+      <div class="cartao rosa" style="padding:16px 24px; font-size:17.5px"><b>Jornada perfeita, NPS <span class="verde">+9</span>:</b> <span style="color:var(--apagado)">mas só 3% dos clientes têm essa experiência hoje.</span></div>
+    </div>
+  </div>
+  <div class="rodape"><span>A empresa sabe satisfazer o cliente quando a operação funciona. Acontece com pouca gente</span><span>10</span></div>
+</section>
+
+<!-- 11 · Recomendações -->
+<section class="slide">
+  <h1>Cinco ações para começar amanhã, com gatilhos que já existem no sistema</h1>
+  <div class="corpo" style="margin-top:24px">
+    <div class="acoes">
+      <div class="cartao acao"><div class="n">1</div><div><h3>Alerta no 1º dia de atraso: avisar o cliente e priorizar a entrega</h3><p>Logística + CX · gatilho: 1 dia de atraso · medir: % de pedidos que chegam a 3+ dias</p></div></div>
+      <div class="cartao acao"><div class="n">2</div><div><h3>Fila prioritária no SAC para quem já teve atraso ou reclamação</h3><p>Atendimento · gatilho: 1ª reclamação ou 2º contato · medir: resolução no 1º contato</p></div></div>
+      <div class="cartao acao"><div class="n">3</div><div><h3>Prometer o prazo que dá para cumprir, não o mais curto</h3><p>Logística · gatilho: % de atraso por rota ou transportadora · medir: entregas no prazo (OTIF)</p></div></div>
+      <div class="cartao acao nova"><div class="n">4</div><div><h3>Classificar cada reclamação por motivo</h3><p>Atendimento + Produto · produto, entrega, cobrança ou atendimento · o motivo mais frequente vira a próxima frente</p></div></div>
+      <div class="cartao acao larga"><div class="n">5</div><div><h3>Acompanhar o NPS por tipo de jornada, não por perfil de cliente</h3><p>CX · mensal · medir: % de clientes em jornada perfeita (hoje, 3%)</p></div></div>
+    </div>
+  </div>
+  <div class="rodape"><span>Recomendações práticas</span><span>11</span></div>
+</section>
+
+<!-- 12 · Modelo preditivo -->
+<section class="slide">
+  <div class="rotulo">Próximo passo</div>
+  <h1>Descobrir quem vai virar detrator <em>antes</em> da pesquisa</h1>
+  <p class="pergunta-modelo" style="margin-top:40px">“Enquanto o pedido ainda está em andamento, qual é a chance de este cliente virar detrator?”</p>
+  <div class="grade duas" style="margin-top:44px">
+    <div class="cartao" style="padding:22px 28px"><h3>Durante a entrega</h3><p>Usa atraso, tentativas de entrega e dados do pedido. <b style="color:var(--texto)">Permite agir no 1º dia de atraso.</b></p></div>
+    <div class="cartao rosa" style="padding:22px 28px"><h3>Antes da pesquisa</h3><p>Acrescenta reclamações, contatos e tempo de resolução. <b style="color:var(--texto)">Última chance de recuperar o cliente.</b></p></div>
+  </div>
+  <div class="fluxo" style="margin-top:22px">
+    <div class="cartao"><b>1 · Todo dia</b>cada pedido em andamento recebe uma nota de risco</div>
+    <div class="cartao"><b>2 · Fila prioritária</b>os de maior risco vão para logística e SAC primeiro</div>
+    <div class="cartao"><b>3 · Teste controlado</b>mede quanto o NPS melhorou de fato</div>
+  </div>
+  <div class="rodape"><span>O modelo serve para priorizar ajuda. Nunca para decidir quem recebe a pesquisa</span><span>12</span></div>
+</section>
+
+<!-- 13 · Limitações -->
+<section class="slide">
+  <h1>O que estes dados não provam, e os cuidados ao usar os resultados</h1>
+  <div class="corpo" style="margin-top:24px">
+    <div class="acoes">
+      <div class="cartao acao"><div><h3>Associação, não causa</h3><p>Atraso e nota baixa andam juntos. Provar que reduzir o atraso sobe a nota exige um teste controlado: aplicar o alerta em parte dos pedidos e comparar.</p></div></div>
+      <div class="cartao acao nova"><div><h3>Não sabemos por que o cliente reclama</h3><p>A base traz quantas reclamações houve, não o motivo. Sem isso, não dá para dizer se o problema é produto, cobrança ou atendimento.</p></div></div>
+      <div class="cartao acao"><div><h3>A base tem sinais de ser sintética</h3><p>A coluna de recompra é derivada da própria nota, e há mais reclamações do que contatos em 97% dos pedidos. A recompra não foi usada como evidência.</p></div></div>
+      <div class="cartao acao"><div><h3>A jornada perfeita tem só 77 clientes</h3><p>O NPS de +9 pode estar entre −8 e +27. O sinal é claro, “outro patamar”; o número exato, não.</p></div></div>
+      <div class="cartao acao larga"><div><h3>Sem datas, e o NPS é métrica de grupo</h3><p>Não dá para ver sazonalidade nem tendência. E uma nota individual é ruidosa: não usar a nota de um cliente para punir ou premiar um atendente.</p></div></div>
+    </div>
+  </div>
+  <div class="rodape"><span>Limitações e riscos</span><span>13</span></div>
+</section>
+
+<!-- 14 · Fechamento -->
+<section class="slide fechamento">
+  <div class="rotulo">Mensagem central</div>
+  <h1>Cumprir o prazo prometido e resolver na primeira vez.</h1>
+  <p class="sub">A insatisfação não vem de quem é o cliente, e sim do que acontece com o pedido dele. O atraso é a maior alavanca, mas o NPS só fica positivo quando entrega e atendimento funcionam juntos. Isso é gerenciável pela operação.</p>
+  <div class="grade duas">
+    <div class="cartao"><div class="rotulo">Próximo passo</div><p>Um modelo que estime, pedido a pedido, a chance de virar detrator, e a classificação das reclamações por motivo.</p></div>
+    <div class="cartao"><div class="rotulo">Código, dados e análise</div><p>github.com/CristovaoTorres/techchallenge-fase1-nps</p></div>
+  </div>
+</section>
+
+<!--
+Como gerar o PDF (a partir da raiz do projeto, com o Google Chrome instalado):
+  chrome --headless --no-pdf-header-footer --virtual-time-budget=10000 ^
+         --print-to-pdf=reports/slides/nps_preditivo_slides.pdf reports/slides/nps_preditivo_slides.html
+As imagens vêm de reports/figures/slides/, geradas pelo notebook 03.
+-->
+</body>
+</html>
