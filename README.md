@@ -25,12 +25,13 @@ O foco é **entendimento do problema, pensamento analítico e storytelling com d
 
 | | Achado |
 |---|---|
-| 🚨 **Retrato** | NPS de **−80**: 84% dos clientes são detratores e só 4% são promotores. |
+| 🚨 **Retrato** | NPS de **−80**: 84% dos clientes são detratores e só 4% são promotores. **9 em cada 10 pedidos chegam atrasados** e **9 em cada 10 clientes registram 2+ reclamações**. |
 | 🚚 **Fator nº 1** | **Atraso na entrega.** Sem atraso: 52% de detratores. Com 3+ dias: **97–100%**. |
 | ⏱️ **Ponto de ruptura** | **A nota cai ~1 ponto por dia de atraso, desde o 1º dia.** A partir do **3º dia**, 97%+ já são detratores. A ação precisa começar no 1º dia. |
 | 📐 **Quanto pesa cada um** | Os 4 fatores juntos explicam **56%** da variação da nota. Cada dia de atraso custa 1 ponto; cada reclamação, 0,4; cada contato a mais, 0,3. |
 | 📦 **Prazo ≠ atraso** | O prazo prometido de entrega **não** afeta a nota. O que pesa é **quebrar a promessa**. |
 | 📞 **Atendimento** | Reclamações e contatos repetidos derrubam a nota: 3+ contatos = 95% de detratores. |
+| ⚖️ **O atraso não basta sozinho** | O atraso é a maior alavanca (a parte da nota que só ele explica é ~10× a das reclamações), mas **entre os pedidos entregues no prazo o NPS ainda é −34**, por causa das reclamações (72% deles reclamaram 2+ vezes). No prazo **e** com até 1 reclamação, o NPS vai a **+9**. Na simulação, zerar o atraso leva o NPS a ≈ −49; resolver atraso e reclamações juntos, a ≈ −13. |
 | 👥 **Perfil do cliente** | Região, idade, tempo de casa e valor do pedido **não** mudam o NPS (todos ≈ −80). |
 | ✅ **Jornada perfeita** | Sem atraso e sem problemas no atendimento, a nota média é **8,1** e o NPS fica em torno de **+9**. Mas só 3% dos clientes (77) têm essa experiência, e com tão poucos o NPS pode estar entre −8 e +27. |
 | 🔍 **Dado suspeito** | A coluna de recompra é **exatamente `nps_score >= 8`** em 100% dos pedidos: foi derivada da nota. Por isso **não** é usada como evidência de impacto financeiro. |
@@ -140,6 +141,7 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 - A base não tem datas: não é possível analisar sazonalidade nem a evolução no tempo.
 - A base tem fortes sinais de ser **sintética**: notas com decimais, pico de notas em zero (efeito de piso), mais reclamações do que contatos e recompra derivada da nota. Nem todas as **regras de consistência lógica entre colunas** valem; nenhuma coluna foi usada para corrigir outra, e as análises conjuntas devem ser lidas com essa ressalva.
 - A base **não traz dados de concorrentes**. Como ordem de grandeza, o NPS médio do e-commerce no Brasil é **64** ([Opinion Box](https://www.opinionbox.com/voz-do-cliente/segmentos-avaliados/e-commerce-e-marketplaces/)) e a mediana global de varejo e e-commerce é **55** ([Survicate, 2025](https://survicate.com/nps-benchmarks/)). Os −80 desta base estão muito abaixo, mas, por ser sintética, a comparação não diz que "a empresa está atrás da concorrência".
+- A base traz **quantas** reclamações cada cliente fez, mas não o **motivo** (produto, entrega, cobrança, atendimento). Não dá para dizer por que quem recebeu no prazo ainda reclama; classificar as reclamações por motivo é o próximo dado a coletar.
 - A **jornada perfeita** tem só 77 clientes: o NPS desse grupo (+9) tem intervalo de confiança de −8 a +27. O sinal ("outro patamar") é claro; o número exato não é.
 - O modelo preditivo (desafio opcional 4) **não foi implementado**; a estratégia está descrita na seção 6 do notebook 03.
 
@@ -157,7 +159,8 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 │   ├── __init__.py
 │   └── preparacao.py         # carga, classificação do NPS, faixas, regressão e bootstrap (fonte única)
 ├── reports/
-│   ├── figures/              # gráficos gerados pelos notebooks (usados nos slides)
+│   ├── figures/              # gráficos gerados pelos notebooks
+│   │   └── slides/           # os mesmos gráficos sem o título interno, para colar nos slides
 │   └── slides/               # apresentação para público não técnico (PDF)
 ├── .gitattributes            # fim de linha LF e arquivos binários, igual em qualquer sistema
 ├── .gitignore                # exclui .venv, caches e material do curso
