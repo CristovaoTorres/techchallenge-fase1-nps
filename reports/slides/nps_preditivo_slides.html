@@ -96,6 +96,20 @@
   .fluxo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .fluxo .cartao { padding: 18px 22px; font-size: 17px; line-height: 1.4; }
   .fluxo b { color: var(--vermelho); display: block; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .fluxo.quatro { grid-template-columns: repeat(4, 1fr); }
+  .exemplo { margin-top: 18px; padding: 18px 26px; display: flex; gap: 18px; align-items: center; }
+  .exemplo p { font-size: 19px; line-height: 1.45; }
+
+  /* Ganho estimado e selos (recomendações) */
+  .ganho { display: flex; align-items: center; justify-content: center; gap: 34px; background: var(--cartao-rosa); border-radius: 18px; padding: 10px 30px; text-align: center; }
+  .ganho .numero.medio { font-size: 46px; }
+  .ganho .seta { font-size: 36px; color: var(--apagado); }
+  .ganho .legenda { margin-top: 2px; }
+  .acao.compacta { padding: 14px 24px; }
+  .acao.compacta h3 { font-size: 18.5px; margin-bottom: 4px; }
+  .acao.compacta p { font-size: 15px; }
+  .selo { display: inline-block; background: var(--vermelho); color: #fff; font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border-radius: 6px; padding: 3px 9px; margin-bottom: 6px; white-space: nowrap; }
+  .selo.cinza { background: var(--cinza); }
   .pergunta-modelo { font-size: 24px; line-height: 1.4; font-weight: 600; border-left: 5px solid var(--vermelho); padding: 4px 0 4px 22px; margin-top: 26px; }
 
   /* Fechamento */
@@ -144,6 +158,7 @@
 <section class="slide">
   <div class="rotulo">A pergunta da análise</div>
   <h1 style="font-size:44px">Quais fatores da operação derrubam a satisfação do cliente, e como agir <em>antes</em> da pesquisa de NPS?</h1>
+  <p class="pergunta-modelo" style="margin-top:34px"><span class="destaque">Resposta curta:</span> o atraso na entrega e as reclamações não resolvidas. Os dois acontecem antes da nota.</p>
   <div class="etapas">
     <div class="cartao"><small>Etapa 1</small><h3>Compra</h3><p>valor, itens, desconto, parcelas</p></div>
     <div class="cartao"><small>Etapa 2</small><h3>Entrega</h3><p>prazo, atraso, frete, tentativas</p></div>
@@ -164,7 +179,7 @@
       <div><div class="numero medio destaque">9 em 10</div><div class="legenda">clientes registram <b style="color:var(--texto)">2 ou mais reclamações</b></div></div>
     </div>
   </div>
-  <div class="rodape"><span>Com 2.500 clientes, o NPS verdadeiro está entre −82 e −78 · Referência: e-commerce Brasil 64 (Opinion Box) · global 55 (Survicate, 2025)</span><span>4</span></div>
+  <div class="rodape"><span>Detrator = nota abaixo de 7. Com a régua “até 6”, o NPS fica entre −70 e −66: a conclusão não muda · E-commerce Brasil: +64</span><span>4</span></div>
 </section>
 
 <!-- 5 · Fatores -->
@@ -243,49 +258,55 @@
 
 <!-- 11 · Recomendações -->
 <section class="slide">
-  <h1>Cinco ações para começar amanhã, com gatilhos que já existem no sistema</h1>
-  <div class="corpo" style="margin-top:24px">
-    <div class="acoes">
-      <div class="cartao acao"><div class="n">1</div><div><h3>Alerta no 1º dia de atraso: avisar o cliente e priorizar a entrega</h3><p>Logística + CX · gatilho: 1 dia de atraso · medir: % de pedidos que chegam a 3+ dias</p></div></div>
-      <div class="cartao acao"><div class="n">2</div><div><h3>Fila prioritária no SAC para quem já teve atraso ou reclamação</h3><p>Atendimento · gatilho: 1ª reclamação ou 2º contato · medir: resolução no 1º contato</p></div></div>
-      <div class="cartao acao"><div class="n">3</div><div><h3>Prometer o prazo que dá para cumprir, não o mais curto</h3><p>Logística · gatilho: % de atraso por rota ou transportadora · medir: entregas no prazo (OTIF)</p></div></div>
-      <div class="cartao acao nova"><div class="n">4</div><div><h3>Classificar cada reclamação por motivo</h3><p>Atendimento + Produto · produto, entrega, cobrança ou atendimento · o motivo mais frequente vira a próxima frente</p></div></div>
-      <div class="cartao acao larga"><div class="n">5</div><div><h3>Acompanhar o NPS por tipo de jornada, não por perfil de cliente</h3><p>CX · mensal · medir: % de clientes em jornada perfeita (hoje, 3%)</p></div></div>
+  <h1>Atraso + reclamações: o NPS pode ir de <em>−80</em> para perto de <span class="verde">−13</span></h1>
+  <div class="corpo" style="margin-top:20px; flex-direction:column; gap:12px">
+    <div class="ganho">
+      <div><div class="numero medio destaque">−80</div><div class="legenda">hoje</div></div>
+      <div class="seta">→</div>
+      <div><div class="numero medio">≈ −49</div><div class="legenda">zerando o atraso</div></div>
+      <div class="seta">→</div>
+      <div><div class="numero medio verde">≈ −13</div><div class="legenda">atraso + reclamações</div></div>
+    </div>
+    <div class="acoes" style="gap:12px">
+      <div class="cartao acao compacta"><div class="n">1</div><div><span class="selo">Comece por aqui</span><h3>Alerta no 1º dia de atraso: avisar o cliente e priorizar a entrega</h3><p>Logística + CX · medir: % que chega a 3+ dias</p></div></div>
+      <div class="cartao acao compacta"><div class="n">2</div><div><span class="selo">Comece por aqui</span><h3>Fila prioritária no SAC para quem já teve atraso ou reclamação</h3><p>Atendimento · gatilho: 1ª reclamação ou 2º contato</p></div></div>
+      <div class="cartao acao compacta"><div class="n">3</div><div><span class="selo cinza">Custo quase zero</span><h3>Prometer o prazo que dá para cumprir</h3><p>Logística · o prazo prometido não muda a nota; o atraso, sim</p></div></div>
+      <div class="cartao acao compacta nova"><div class="n">4</div><div><h3>Classificar cada reclamação por motivo</h3><p>Atendimento + Produto · o motivo mais frequente vira a próxima frente</p></div></div>
+      <div class="cartao acao compacta larga"><div class="n">5</div><div><h3>Acompanhar o NPS por tipo de jornada, não por perfil de cliente</h3><p>CX · mensal · medir: % de clientes em jornada perfeita (hoje, 3%)</p></div></div>
     </div>
   </div>
-  <div class="rodape"><span>Recomendações práticas</span><span>11</span></div>
+  <div class="rodape"><span>Estimativa pelos pesos da regressão: mostra o potencial, não um resultado garantido. Cada ação começa com teste controlado</span><span>11</span></div>
 </section>
 
 <!-- 12 · Modelo preditivo -->
 <section class="slide">
   <div class="rotulo">Próximo passo</div>
   <h1>Descobrir quem vai virar detrator <em>antes</em> da pesquisa</h1>
-  <p class="pergunta-modelo" style="margin-top:40px">“Enquanto o pedido ainda está em andamento, qual é a chance de este cliente virar detrator?”</p>
-  <div class="grade duas" style="margin-top:44px">
-    <div class="cartao" style="padding:22px 28px"><h3>Durante a entrega</h3><p>Usa o atraso e os dados do pedido. <b style="color:var(--texto)">Permite agir no 1º dia de atraso.</b></p></div>
-    <div class="cartao rosa" style="padding:22px 28px"><h3>Antes da pesquisa</h3><p>Acrescenta reclamações, contatos e tempo de resolução. <b style="color:var(--texto)">Última chance de recuperar o cliente.</b></p></div>
+  <p class="pergunta-modelo" style="margin-top:30px">“Enquanto o pedido ainda está em andamento, qual é a chance de este cliente virar detrator?”</p>
+  <div class="fluxo quatro" style="margin-top:30px">
+    <div class="cartao"><b>1 · Detectar</b>nota de risco diária: durante a entrega (atraso) e antes da pesquisa (+ atendimento)</div>
+    <div class="cartao"><b>2 · Priorizar</b>os pedidos de maior risco vão primeiro para logística e SAC</div>
+    <div class="cartao"><b>3 · Agir</b>avisar o cliente, priorizar a entrega, resolver no 1º contato</div>
+    <div class="cartao"><b>4 · Medir</b>teste controlado: quanto o NPS melhorou de fato</div>
   </div>
-  <div class="fluxo" style="margin-top:22px">
-    <div class="cartao"><b>1 · Todo dia</b>cada pedido em andamento recebe uma nota de risco</div>
-    <div class="cartao"><b>2 · Fila prioritária</b>os de maior risco vão para logística e SAC primeiro</div>
-    <div class="cartao"><b>3 · Teste controlado</b>mede quanto o NPS melhorou de fato</div>
+  <div class="cartao rosa exemplo">
+    <span class="selo">Exemplo</span>
+    <p>Pedido com <b>2 dias de atraso</b> e <b>2 reclamações</b>: na base, <b class="destaque">71%</b> desses clientes viraram detratores. <b>Entra hoje na fila prioritária do SAC.</b></p>
   </div>
   <div class="rodape"><span>O modelo serve para priorizar ajuda. Nunca para decidir quem recebe a pesquisa</span><span>12</span></div>
 </section>
 
 <!-- 13 · Limitações -->
 <section class="slide">
-  <h1>O que estes dados não provam, e os cuidados ao usar os resultados</h1>
-  <div class="corpo" style="margin-top:24px">
-    <div class="acoes">
-      <div class="cartao acao"><div><h3>Associação, não causa</h3><p>Atraso e nota baixa andam juntos. Provar que reduzir o atraso sobe a nota exige um teste controlado: aplicar o alerta em parte dos pedidos e comparar.</p></div></div>
-      <div class="cartao acao nova"><div><h3>Não sabemos por que o cliente reclama</h3><p>A base traz quantas reclamações houve, não o motivo. Sem isso, não dá para dizer se o problema é produto, cobrança ou atendimento.</p></div></div>
-      <div class="cartao acao nova"><div><h3>A recompra é a própria nota</h3><p>Em 100% dos pedidos, "recomprou" é o mesmo que "nota 8 ou mais". Usá-la faria a análise parecer melhor (de 56% para 64% explicados) sem explicar nada. Por isso ficou de fora, junto com o CSAT.</p></div></div>
-      <div class="cartao acao"><div><h3>A jornada perfeita tem só 77 clientes</h3><p>O NPS de +9 pode estar entre −8 e +27. O sinal é claro, “outro patamar”; o número exato, não.</p></div></div>
-      <div class="cartao acao larga"><div><h3>Base com sinais de ser sintética, sem datas, e o NPS é métrica de grupo</h3><p>Há mais reclamações do que contatos em 97% dos pedidos. Não dá para ver sazonalidade nem tendência. E uma nota individual é ruidosa: não usar a nota de um cliente para punir ou premiar um atendente.</p></div></div>
+  <h1>Três cuidados antes de usar estes resultados</h1>
+  <div class="corpo" style="margin-top:34px">
+    <div class="grade tres" style="align-self:flex-start">
+      <div class="cartao"><div class="indice">01</div><h3>Associação, não causa</h3><p>Atraso e nota baixa andam juntos, mas isso não prova que um causa o outro. Cada ação começa com um teste controlado: aplicar em parte dos pedidos e comparar.</p></div>
+      <div class="cartao rosa"><div class="indice">02</div><h3>Não sabemos por que o cliente reclama</h3><p>A base conta as reclamações, mas não o motivo: produto, cobrança ou atendimento? É o próximo dado a coletar.</p></div>
+      <div class="cartao"><div class="indice">03</div><h3>Base simulada, e o NPS é métrica de grupo</h3><p>Os números precisam ser refeitos com dados reais. Não usar a nota de um cliente para punir um atendente, nem o modelo para escolher quem recebe a pesquisa.</p></div>
     </div>
   </div>
-  <div class="rodape"><span>Limitações e riscos</span><span>13</span></div>
+  <div class="rodape"><span>Recompra e CSAT ficaram de fora: são medidos junto com a nota (a recompra é a própria nota ≥ 8 em 100% dos pedidos)</span><span>13</span></div>
 </section>
 
 <!-- 14 · Fechamento -->
