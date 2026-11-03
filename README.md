@@ -8,7 +8,7 @@ Análise de dados operacionais de um e-commerce (pedidos, logística e atendimen
 |---|---|
 | 📓 Notebooks (entendimento, preparação e EDA) | [`notebooks/`](notebooks/) |
 | 📊 Slides (storytelling gerencial) | [`reports/slides/nps_preditivo_slides.pdf`](reports/slides/nps_preditivo_slides.pdf) |
-| 🎥 Vídeo executivo (até 5 min) | 🚧 em produção |
+| 🎥 Vídeo executivo (até 5 min) | [`reports/video/nps_preditivo_video.mp4`](reports/video/nps_preditivo_video.mp4) |
 
 ---
 
@@ -162,7 +162,8 @@ O passo a passo completo, com o código, está nas seções 5 e 9 do notebook [`
 ├── reports/
 │   ├── figures/              # gráficos gerados pelos notebooks
 │   │   └── slides/           # os mesmos gráficos sem o título interno, para colar nos slides
-│   └── slides/               # apresentação para público não técnico (PDF) e o HTML que a gera
+│   ├── slides/               # apresentação para público não técnico (PDF) e o HTML que a gera
+│   └── video/                # vídeo executivo (até 5 min)
 ├── .gitattributes            # fim de linha LF e arquivos binários, igual em qualquer sistema
 ├── .gitignore                # exclui .venv, caches e material do curso
 ├── requirements.txt          # dependências para rodar a análise
