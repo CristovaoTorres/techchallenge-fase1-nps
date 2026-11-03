@@ -243,5 +243,5 @@ pre-commit run --all-files    # roda tudo manualmente
 |---|---|
 | Cristóvão Farias Torres Junior | *(preencher)* |
 | Pedro Henrique Gingeira Matos | 378058 |
-| Alex Procópio Lima Cabral do Carmo | *(preencher)* |
+| Alex Procópio Lima Cabral do Carmo | 376773 |
 | Jonathan Santos Oliveira | 378174 |
