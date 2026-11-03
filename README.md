@@ -241,4 +241,7 @@ pre-commit run --all-files    # roda tudo manualmente
 
 | Nome | RM |
 |---|---|
-| Cristóvão Torres | *(preencher)* |
+| Cristóvão Farias Torres Junior | *(preencher)* |
+| Pedro Henrique Gingeira Matos | *(preencher)* |
+| Alex Procópio Lima Cabral do Carmo | *(preencher)* |
+| Jonathan Santos Oliveira | *(preencher)* |
